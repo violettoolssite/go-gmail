@@ -81,8 +81,12 @@
             <h3 class="modal-title">为号码绑定对应邮箱</h3>
             <p class="modal-desc">号码：<span id="modal-phone-display" class="modal-phone"></span></p>
 
-            <div class="input-group">
-                <input type="text" id="modal-email-input" placeholder="输入注册此号码的 Google 邮箱" autocomplete="off">
+            <div class="input-group" style="margin-bottom: 24px;">
+                <label class="input-label">绑定谷歌邮箱 (只需填写前缀)</label>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <input type="text" id="modal-email-input" placeholder="输入前缀" style="flex: 1;" autocomplete="off">
+                    <span style="color: var(--text-light); font-weight: 500;">@gmail.com</span>
+                </div>
             </div>
 
             <div class="modal-actions">

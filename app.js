@@ -32,10 +32,19 @@ function loadState() {
     state.token = localStorage.getItem('hz_token') || null;
     state.phone = localStorage.getItem('hz_phone') || null;
     state.pinnedEmail = localStorage.getItem('hz_email') || null;
-    try { state.smsHistory = JSON.parse(localStorage.getItem('hz_smsHistory') || '[]'); } catch { state.smsHistory = []; }
+    try {
+        state.smsHistory = JSON.parse(localStorage.getItem('hz_smsHistory') || '[]');
+        // 自动清理掉历史记录里不小心存入的报错文本
+        state.smsHistory = state.smsHistory.filter(sms =>
+            !sms.content.includes('没有获取该号码') &&
+            !sms.content.includes('无法读取短信') &&
+            !sms.content.includes('未获取')
+        );
+    } catch { state.smsHistory = []; }
     try { state.pinnedList = JSON.parse(localStorage.getItem('hz_pinnedList') || '[]'); } catch { state.pinnedList = []; }
 
-    // 强制插入要求的历史记录 17329396205
+    // 自动清理意外存入的无效数据 (null)
+    state.pinnedList = state.pinnedList.filter(p => p && p.phone && p.phone !== 'null');
     const hasSpecial = state.pinnedList.some(p => p.phone === '17329396205');
     if (!hasSpecial) {
         state.pinnedList.push({ phone: '17329396205', email: '历史账号（自动添加）' });
@@ -118,16 +127,22 @@ function renderUI() {
 
 function renderSms() {
     const list = document.getElementById('sms-list');
-    if (state.smsHistory.length === 0) {
-        list.innerHTML = '<div class="empty-state">目前没有收到任何短信，等待接收...</div>';
+
+    // 逻辑调整：如果有正在使用的号码，只看该号的；如果没有号码，看全部记录。
+    const displayList = state.phone
+        ? state.smsHistory.filter(sms => !sms.targetPhone || sms.targetPhone === state.phone)
+        : state.smsHistory;
+
+    if (displayList.length === 0) {
+        list.innerHTML = `<div class="empty-state">${state.phone ? '该号码暂无验证码，等待接收...' : '暂无短信记录'}</div>`;
         return;
     }
 
     // 倒序显示（最新的在最上面）
-    const html = [...state.smsHistory].reverse().map(sms => `
+    const html = [...displayList].reverse().map(sms => `
         <div class="sms-bubble">
             <div class="sms-head">
-                <span>收到验证码</span>
+                <span style="font-weight:600;">${sms.targetPhone || '历史记录'}</span>
                 <span>${sms.time}</span>
             </div>
             ${sms.code ? `<div class="sms-code" title="点击复制" onclick="copySmsCode('${sms.code}')">${sms.code}</div>` : ''}
@@ -151,6 +166,7 @@ function renderPinnedList() {
             </div>
             <div class="h-actions">
                 <button class="btn-text small" onclick="loadPinnedNumber(${idx})">载入</button>
+                <button class="btn-text small" onclick="editPinnedNumber(${idx})" style="color:var(--primary);">修改</button>
                 <button class="btn-text danger small" onclick="removePinnedNumber(${idx})">删除</button>
             </div>
         </div>
@@ -210,14 +226,22 @@ async function refreshSms() {
             state.smsHistory[state.smsHistory.length - 1].content === rawContent;
 
         if (!isDuplicate && rawContent) {
-            // 过滤：有时候服务器会把错误信息放进 sms 字段下返回 code 0，我们需要更具攻击性地过滤这些假成功真报错
-            if (rawContent.includes('没有获取该号码') || rawContent.includes('无法读取短信') || rawContent.includes('未获取')) {
+            // 过滤：有时候服务器会把错误信息放进 sms 字段下返回 code 0
+            const lowerContent = rawContent.toLowerCase();
+            const isErrorMsg = lowerContent.includes('没有获取该号码') ||
+                lowerContent.includes('无法读取短信') ||
+                lowerContent.includes('未获取') ||
+                lowerContent.includes('没有权限') ||
+                lowerContent.includes('不存在');
+
+            if (isErrorMsg) {
                 stopPoll();
                 return;
             }
 
             const codeMatch = rawContent.match(/\b(\d{4,8})\b/);
             const smsObj = {
+                targetPhone: state.phone, // 记录这条短信归属哪个号码
                 time: new Date().toLocaleTimeString(),
                 content: rawContent,
                 code: codeMatch ? codeMatch[1] : ''
@@ -261,6 +285,7 @@ document.getElementById('btn-get-phone').addEventListener('click', async () => {
         setStatus('获取成功，请绑定谷歌邮箱', 'success');
 
         // 获取号码后直接弹出绑定邮筱框
+        modalTargetPhone = state.phone; // 修复：自动弹出时也需要设置目标号码
         document.getElementById('pin-modal').style.display = 'flex';
         document.getElementById('modal-phone-display').textContent = state.phone;
         document.getElementById('modal-email-input').value = '';
@@ -287,33 +312,65 @@ document.getElementById('btn-black').addEventListener('click', async () => {
 });
 
 // 绑定相关
+let modalTargetPhone = null;
+
 document.getElementById('btn-pin').addEventListener('click', () => {
+    if (!state.phone) return;
+    modalTargetPhone = state.phone;
     document.getElementById('pin-modal').style.display = 'flex';
     document.getElementById('modal-phone-display').textContent = state.phone;
-    document.getElementById('modal-email-input').value = state.pinnedEmail || '';
+
+    // 如果已有绑定，只显示前缀
+    const currentEmail = state.pinnedEmail || '';
+    document.getElementById('modal-email-input').value = currentEmail.replace('@gmail.com', '');
     document.getElementById('modal-email-input').focus();
 });
 
+window.editPinnedNumber = function (idx) {
+    const item = state.pinnedList[idx];
+    if (!item) return;
+    modalTargetPhone = item.phone;
+    document.getElementById('pin-modal').style.display = 'flex';
+    document.getElementById('modal-phone-display').textContent = item.phone;
+
+    const currentEmail = item.email || '';
+    document.getElementById('modal-email-input').value = currentEmail.replace('@gmail.com', '');
+    document.getElementById('modal-email-input').focus();
+};
+
 document.getElementById('btn-modal-confirm').addEventListener('click', () => {
-    const email = document.getElementById('modal-email-input').value.trim();
-    if (!email) {
+    const prefix = document.getElementById('modal-email-input').value.trim();
+    if (!prefix) {
         document.getElementById('modal-email-input').style.borderColor = 'var(--danger)';
         return;
     }
-    state.pinnedEmail = email;
+
+    if (!modalTargetPhone) {
+        setStatus('操作异常：未识别到目标号码', 'error');
+        document.getElementById('pin-modal').style.display = 'none';
+        return;
+    }
+
+    // 自动补全 @gmail.com
+    const fullEmail = prefix.includes('@') ? prefix : prefix + '@gmail.com';
+
+    // 如果操作的是当前页面的号码
+    if (modalTargetPhone === state.phone) {
+        state.pinnedEmail = fullEmail;
+    }
 
     // 更新或添加到历史列表
-    const existIdx = state.pinnedList.findIndex(p => p.phone === state.phone);
+    const existIdx = state.pinnedList.findIndex(p => p.phone === modalTargetPhone);
     if (existIdx >= 0) {
-        state.pinnedList[existIdx].email = email;
+        state.pinnedList[existIdx].email = fullEmail;
     } else {
-        state.pinnedList.unshift({ phone: state.phone, email: email });
+        state.pinnedList.unshift({ phone: modalTargetPhone, email: fullEmail });
     }
 
     saveState();
     document.getElementById('pin-modal').style.display = 'none';
     renderUI();
-    setStatus('绑定保存成功', 'success');
+    setStatus('保存成功', 'success');
 });
 
 document.getElementById('btn-modal-cancel').addEventListener('click', () => {
@@ -389,6 +446,7 @@ window.loadPinnedNumber = async function (idx) {
 
     if (r.code === 1 || r.code === 200 || r.phone) {
         // 成功获取回来了
+        state.phone = target.phone; // 修复：必须更新当前号码状态
         state.pinnedEmail = target.email;
         // 取消移除旧记录：state.smsHistory = [];
         saveState();
