@@ -1,0 +1,543 @@
+/* 高级简约白风格 */
+:root {
+    --bg: #fafafa;
+    --card-bg: #ffffff;
+    --text-main: #111827;
+    --text-sec: #6b7280;
+    --text-light: #9ca3af;
+    --border: #e5e7eb;
+    --accent: #0f172a;
+    --accent-hover: #334155;
+    --danger: #ef4444;
+    --success: #10b981;
+    --radius: 16px;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg);
+    color: var(--text-main);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+}
+
+.app {
+    max-width: 560px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* 顶部状态与导航 */
+.top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    gap: 12px;
+}
+
+.status-top {
+    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-sec);
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(-5px);
+    flex-grow: 1;
+    text-align: center;
+}
+
+.balance-display {
+    font-size: 13px;
+    background: #f1f5f9;
+    padding: 6px 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.balance-label {
+    color: var(--text-sec);
+}
+
+.balance-val {
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.status-top {
+    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-sec);
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(-5px);
+}
+
+.status-top.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.status-top.info {
+    color: var(--text-sec);
+    background: #f3f4f6;
+}
+
+.status-top.success {
+    color: #065f46;
+    background: #d1fae5;
+}
+
+.status-top.error {
+    color: #991b1b;
+    background: #fee2e2;
+}
+
+/* 主显卡片 */
+.main-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 32px;
+    box-shadow: var(--shadow);
+    margin-bottom: 32px;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-sec);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.phone-hero {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.the-number {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-main);
+}
+
+/* Meta actions inside card */
+.phone-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-size: 14px;
+}
+
+.meta-bind {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bind-label {
+    color: var(--text-light);
+}
+
+.bind-value {
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+/* 短信区 */
+.sms-section {
+    padding: 0 12px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.section-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.poll-anim {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-sec);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.poll-anim.active {
+    opacity: 1;
+}
+
+.poll-anim .dot {
+    width: 6px;
+    height: 6px;
+    background: var(--success);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+}
+
+.sms-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sms-bubble {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.sms-head {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 12px;
+    color: var(--text-sec);
+}
+
+.sms-code {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 4px;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    display: inline-block;
+    padding: 2px 6px;
+    margin-left: -6px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.sms-code:hover {
+    background: rgba(15, 23, 42, 0.05);
+    /* very light accent */
+}
+
+.sms-code:active {
+    background: rgba(15, 23, 42, 0.1);
+}
+
+.sms-text {
+    font-size: 14px;
+    color: var(--text-main);
+    word-break: break-word;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 0;
+    color: var(--text-light);
+    font-size: 14px;
+}
+
+/* 历史列表 */
+.history-section {
+    padding: 0 12px;
+    margin-top: 32px;
+}
+
+.pinned-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.history-item {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 16px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.h-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.h-phone {
+    font-size: 16px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.h-email {
+    font-size: 13px;
+    color: var(--text-sec);
+}
+
+.h-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* 按钮样式 */
+button {
+    font-family: inherit;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    outline: none;
+}
+
+button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.btn-text {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 14px;
+    padding: 6px 12px;
+    border-radius: 6px;
+}
+
+.btn-text:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.btn-text.small {
+    font-size: 13px;
+    padding: 4px 8px;
+}
+
+.btn-text.danger {
+    color: var(--danger);
+}
+
+.btn-text.danger:hover:not(:disabled) {
+    background: #fee2e2;
+}
+
+.btn-icon-text {
+    font-size: 13px;
+    background: #f3f4f6;
+    color: var(--text-main);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.btn-icon-text:hover:not(:disabled) {
+    background: #e5e7eb;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
+}
+
+.btn-flat {
+    padding: 10px 16px;
+    color: var(--text-sec);
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.btn-flat:hover {
+    color: var(--text-main);
+}
+
+/* 模态框 */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.modal {
+    background: #fff;
+    width: 380px;
+    border-radius: var(--radius);
+    padding: 32px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modal-title {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.modal-desc {
+    font-size: 14px;
+    color: var(--text-sec);
+    margin-bottom: 24px;
+}
+
+.modal-phone {
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.input-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-sec);
+    margin-bottom: 4px;
+}
+
+.input-group input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.input-group input:focus {
+    border-color: var(--accent);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 24px;
+}
+
+/* 响应式设计 */
+@media (max-width: 480px) {
+    .app {
+        margin: 20px auto;
+        padding: 0 16px;
+    }
+
+    .main-card {
+        padding: 24px 20px;
+    }
+
+    .the-number {
+        font-size: 28px;
+    }
+
+    .phone-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .meta-actions {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .modal {
+        width: 90%;
+        padding: 24px;
+    }
+
+    .top-nav {
+        flex-wrap: wrap;
+    }
+
+    .status-top {
+        order: 3;
+        width: 100%;
+    }
+}
