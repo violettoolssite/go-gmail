@@ -468,6 +468,34 @@ window.removePinnedNumber = function (idx) {
     renderUI();
 };
 
+// 导出 JSON 备份
+document.getElementById('btn-export-json').addEventListener('click', () => {
+    if (!state.pinnedList || state.pinnedList.length === 0) {
+        setStatus('目前没有可导出的历史记录', 'info');
+        return;
+    }
+
+    try {
+        const dataStr = JSON.stringify(state.pinnedList, null, 4);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+
+        const date = new Date().toISOString().split('T')[0];
+        link.href = url;
+        link.download = `谷歌邮箱绑定记录备份_${date}.json`;
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        setStatus('备份文件已准备好下载', 'success');
+    } catch (e) {
+        setStatus('导出失败：' + e.message, 'error');
+    }
+});
+
 // ===================== 初始化 =====================
 async function init() {
     loadState();
