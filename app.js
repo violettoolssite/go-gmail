@@ -71,7 +71,7 @@ async function apiGetPhone(phoneParam = null) {
     if (phoneParam) params.phone = phoneParam;
     return await apiCall(params);
 }
-async function apiGetSms(phone) { return await apiCall({ api: 'getMessage', author: 'loginaction6', token: state.token, sid: SID, phone }); }
+async function apiGetSms(phone) { return await apiCall({ api: 'getMessage', author: apiCode, token: state.token, sid: SID, phone }); }
 async function apiCancelPhone(phone) { return await apiCall({ api: 'cancelPhone', token: state.token, phone, sid: SID }); }
 async function apiCancelAll() { return await apiCall({ api: 'cancelAllRecv', token: state.token }); }
 async function apiBlackPhone(phone) { return await apiCall({ api: 'blackPhone', token: state.token, phone, sid: SID }); }
@@ -221,9 +221,10 @@ async function refreshSms() {
     const r = await apiGetSms(state.phone);
     if (r.code === '0' || r.code === 0 || r.msg === 'success') {
         const rawContent = r.sms || r.yzm || '';
-        // 防止重复添加同一条短信（检查是否包含于最近一条记录）
-        const isDuplicate = state.smsHistory.length > 0 &&
-            state.smsHistory[state.smsHistory.length - 1].content === rawContent;
+        // 防止重复添加同一条短信（检查该号码的历史记录中是否已存在完全相同的内容）
+        const isDuplicate = state.smsHistory.some(sms =>
+            sms.targetPhone === state.phone && sms.content === rawContent
+        );
 
         if (!isDuplicate && rawContent) {
             // 过滤：有时候服务器会把错误信息放进 sms 字段下返回 code 0
