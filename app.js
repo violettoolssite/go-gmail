@@ -260,33 +260,51 @@ async function refreshSms() {
 
 // ===================== 事件处理 =====================
 
-// 获取新号码
-document.getElementById('btn-get-phone').addEventListener('click', async () => {
+// 获取新号码 (改为弹出可选填写框)
+document.getElementById('btn-get-phone').addEventListener('click', () => {
+    // 只有在已登录状态下才弹出
+    if (!state.token) {
+        setStatus('请先完成 API 配置并登录', 'error');
+        return;
+    }
+    document.getElementById('designated-phone-input').value = '';
+    document.getElementById('get-number-modal').style.display = 'flex';
+    setTimeout(() => document.getElementById('designated-phone-input').focus(), 50);
+});
+
+// 取消获取
+document.getElementById('btn-get-modal-cancel').addEventListener('click', () => {
+    document.getElementById('get-number-modal').style.display = 'none';
+});
+
+// 确认获取逻辑
+document.getElementById('btn-get-modal-confirm').addEventListener('click', async () => {
+    const targetPhone = document.getElementById('designated-phone-input').value.trim() || null;
+    document.getElementById('get-number-modal').style.display = 'none';
+
     stopPoll();
     setStatus('清理后台挂载号码...', 'info', false);
 
-    // 强制释放该账号名下所有的号码（包括其他设备获取或未清理的）
+    // 强制释放该账号名下所有的号码
     await apiCancelAll();
 
     document.getElementById('btn-get-phone').disabled = true;
     document.getElementById('phone-display').textContent = '获取中...';
-    setStatus('正在请求新号码...', 'info', false);
+    setStatus(targetPhone ? `正在请求指定号码 ${targetPhone}...` : '正在请求新号码...', 'info', false);
 
-    const r = await apiGetPhone();
+    const r = await apiGetPhone(targetPhone);
     document.getElementById('btn-get-phone').disabled = false;
 
     if (r.code === 1 || r.code === 200 || r.phone) {
         state.phone = r.phone || r.data?.phone;
         state.pinnedEmail = null; // 重置绑定
-        // 取消这行代码，让短信记录永存
-        // state.smsHistory = [];    // 清空旧历史
         saveState();
         renderUI();
         startPoll();
-        setStatus('获取成功，请绑定谷歌邮箱', 'success');
+        setStatus(targetPhone ? `已成功获取指定号码：${state.phone}` : '获取成功，请绑定谷歌邮箱', 'success');
 
-        // 获取号码后直接弹出绑定邮筱框
-        modalTargetPhone = state.phone; // 修复：自动弹出时也需要设置目标号码
+        // 获取号码后直接弹出绑定邮箱框
+        modalTargetPhone = state.phone;
         document.getElementById('pin-modal').style.display = 'flex';
         document.getElementById('modal-phone-display').textContent = state.phone;
         document.getElementById('modal-email-input').value = '';
@@ -554,15 +572,19 @@ document.getElementById('btn-reload-confirm').addEventListener('click', async ()
     setStatus('清理后台挂载号码...', 'info', false);
     await apiCancelAll();
 
-    setStatus(`正在向平台请求找回号码 ${num} ...`, 'info', false);
-    const r = await apiGetPhone(num);
+    // 模式：换号时先释放所有（防并发占用和计费异常）
+    await apiCancelAll();
 
-    if (r.code === 1 || r.code === 200 || r.phone) {
-        state.phone = num;
-        saveState();
-        renderUI();
-        startPoll();
-        setStatus(`已重新获取并监听号码：${num}`, 'success');
+    const targetNum = document.getElementById('target-phone-input').value.trim() || null;
+    const r = await apiGetPhone(targetNum);
+    if (r.code === '0' || r.code === 0 || r.msg === 'success') {
+        state.phone = r.phone || r.mobile || r.number;
+        state.pinnedEmail = null; // 新号码初始无绑定
+
+        // 清空指定号码输入框以便下次使用，或者保留
+        // document.getElementById('target-phone-input').value = ''; 
+
+        setStatus('获取成功，请绑定谷歌邮箱', 'success');
     } else {
         setStatus(`重新获取失败：${r.msg || '平台已无该号'}`, 'error');
         state.phone = null;

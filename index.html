@@ -136,6 +136,24 @@
         </div>
     </div>
 
+    <!-- 指定号码获取模态框 (可选) -->
+    <div id="get-number-modal" class="modal-overlay">
+        <div class="modal" style="max-width: 320px;">
+            <h3 class="modal-title" style="font-size: 16px;">获取号码</h3>
+            <p class="modal-desc" style="margin-bottom: 16px;">您可以填入一个指定手机号 (选填)</p>
+
+            <div class="input-group" style="margin-bottom: 20px;">
+                <input type="text" id="designated-phone-input" placeholder="留空则获取随机新号"
+                    style="text-align: center; font-size: 16px; letter-spacing: 1px;" autocomplete="off">
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-flat" id="btn-get-modal-cancel">取消</button>
+                <button class="btn-primary" id="btn-get-modal-confirm">立即获取</button>
+            </div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
     <script>
         // 控制顶部提示条和按钮显示
