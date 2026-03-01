@@ -1,105 +1,16 @@
-# 谷歌邮箱注册专用接码助手 快速指南
+# React + Vite
 
-欢迎使用本工具。本工具专为辅助注册谷歌账号而设计，对接了「豪猪网」的短信接收平台，可快速获取真实的国内移动手机号并提取谷歌短信验证码。
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-> [!IMPORTANT]
-> **声明**：本工具仅作为**手动注册辅助工具**，用于管理接码平台通讯和记录，**不包含**任何自动填写、自动注册、脚本抢号或绕过谷歌安全检测的自动化功能。所有注册流程需由人工手动完成。
+Currently, two official plugins are available:
 
-![软件界面](软件界面.png)
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## 1. 注册与充值
+## React Compiler
 
-首先，你需要拥有一个豪猪网账号并确保内有余额。
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-> **为什么选择 3.3元的单价？**
-> 平台上可能存在几毛钱甚至更便宜的线路，但经过测试，**3.3元/次的高级线路收码成功率最高、最稳定**。为了不浪费时间在低价死号上反复重试，本工具已默认对接了最稳定的高级通道。
+## Expanding the ESLint configuration
 
-[点击前往充值中心进行充值 (h5.haozhuma.com)](https://h5.haozhuma.com/index.php)
-
-![充值进行接码](充值进行接码.png)
-
-## 2. 获取 API 凭证
-
-为了让本工具能够自动调用你的额度获取号码，我们需要配置 API 交互凭证。你需要在豪猪网的用户中心找到这些信息。
-
-![API获取](API获取.png)
-![加入对接码](加入对接码.png)
-
-## 3. 在工具中进行配置
-
-初次打开 `index.html` 时，系统会自动弹出**平台 API 配置**窗口（你也可以随时点击左上角的“配置”修改）：
-
-1. **API 账号名**：填入你在豪猪网获取的由一串英文字符组成的 API 用户名（并非你的手机号登录名）。
-2. **API 密码**：填入对应的 API 通讯密码密钥。
-3. **项目对接码**：系统已内置对接码 `28209-YJI2QSFH3R`，如果你有新的可用业务码，可在此处覆盖填入。
-
-![信息填写](信息填写.png)
-
----
-
-## 4. 开始使用
-
-配置成功后，页面右上角将显示你当前可用的余额。
-
-1. 点击 **[获取新号码]**，系统将消耗你的计费并发请求，并返回一个国内移动号码。
-2. 请在弹窗中**填写你正在注册的谷歌邮箱名（只需填写前缀，系统自动补全 @gmail.com）**，方便以后回溯。
-3. 去谷歌注册页面填入该号码。
-4. 回到本工具等待，通常在 5 ~ 30 秒内会自动出现验证码，点击该粗体验证码即可自动复制。
-
-### 3. 使用技巧与进阶
-*   **指定号码获取**：在「当前可用号码」标题下方，你可以填写特定手机号后再点击【获取新号码】，程序会优先向平台请求该指定号码。
-*   **历史短信隔离**：每条短信记录都会与其归属的手机号自动绑定，当你切换不同的号码时，只会看到属于该号码的短信，互不干扰。
-*   **灵活修改绑定**：在「历史已绑号码」列表中，你可以随时点击【修改】来更正该号码对应的邮箱前缀。
-*   **号码数据备份**：在「历史已绑号码」标题旁，你可以点击**「导出备份」**按钮一键将所有的手机号与邮箱绑定关系导出为 JSON 文件，方便你离线保存和资产盘点。
-*   **找回号码**：如果你曾给号码绑定过邮箱，该号码会出现在「历史已绑号码」中。点击【载入】可尝试向平台发送请求，如果该号码仍在你的有效时限内且未被系统回收，你即可重新监听该号码的后续短信。
-*   **全局释放**：当你获取新号码时，为了防止扣费浪费，本工具会自动向服务端发送全局释放指令，清理你后台可能遗留挂载的其余号码，确保当前只服务一个并发号码。
-
----
-
-## 5. 经验与网络环境防封技巧
-
-> **模拟器免验证码大法**
-> 强烈建议使用 **MuMu 模拟器** 进行谷歌账号的注册。在安卓真机环境模拟下，大概率可以跳过繁琐的“发送短信验证”环节，直接进入接码流程，成功率极高。
-
-> **网络环境与代理选择 (重点)**
-> 谷歌对注册 IP 的风控级别不同，请根据你的用途选择：
->
-> *   **基础需求（看视频、下资源、普通使用）**：使用**普通机房 IP (VPS)** 配合 MuMu 模拟器，注册成功率就已经很大了，不需要额外消费。
-> *   **高级需求（电商、长期养号、海外业务）**：推荐使用 **[Cliproxy](https://cliproxy.com/zh/)** 的【静态住宅 IP】（约 30 元/条的美国原生 IP）。纯净的住宅 IP 能提供极佳的初始权重。
->
-> *注意：*
-> 1. ISP 静态住宅代理在国内无法直接直连使用，需要通过你自己的常规翻墙节点作为前置进行**链式代理 (Chain Proxy)** 才能连通。
-> 2. **强烈建议不要使用常规 VPN 线路**。尤其是那些使用人数众多（如单节点过千人使用）的公共 VPN，此类 IP 几乎全部被谷歌拉黑，注册成功率极低。
->
-> ![cliproxy官网页面](cliproxy官网页面.png)
->
-> 配置好代理后，请务必先打开 [Ping0.cc](https://ping0.cc/) 检查你的伪装度。确保显示为原生住宅 IP、无不良历史，这是不被秒封的核心前提。
-
----
-
-## 6. 如何将工具安装为桌面软件 / 手机 APP
-
-本工具已支持 PWA 技术，可以像原生软件一样“安装”到你的电脑或手机上，获得独立窗口和桌面图标。
-
-### 零脚本“软件化”方案 (推荐)
-由于浏览器安全限制，直接打开本地文件时无法点击网页内的按钮进行安装。但你可以通过以下简单的一步操作，在不使用任何脚本的情况下将助手转变为独立软件：
-
-1.  **在 Chrome 或 Edge 中打开**：直接双击 `index.html`。
-2.  **创建独立快捷方式**：
-    *   点击浏览器右上角的三个点 **`...`** (菜单)。
-    *   选择 **`保存并共享`** (或 `更多工具`) -> **`创建快捷方式...`**。
-    *   在弹出的对话框中，**务必勾选「作为窗口打开」**，然后点击确定。
-3.  **大功告成**：你的桌面上会多出一个助手的图标。双击它，助手将以独立窗口（无地址栏、无标签页）的形式启动，体验与真正的 Windows 软件完全一致。
-
----
-
-> **为何不直接提供按钮？**
-> 现代浏览器要求必须在 `http` 环境（如云服务器）下才允许网页弹出安装按钮。为了保证你不需要下载任何多余的脚本或服务器组件，手动创建快捷方式是目前最纯净、最稳定的“软件化”方案。
-
----
-
-> **刚注册就被封停怎么办？**
-> 如果注册后账号立刻被提示封禁，**不要慌张，这是谷歌的常规机器风控**。
-> 1. 直接点击页面的**申诉**按钮。
-> 2. 在申诉理由里随便写几句话（例如：“正常个人注册使用，请查明解封”）。
-> 3. 通常在 **一天之内** 就能顺利解封。解封后的账号只要**保持节点环境固定不变**，就可以一直稳定使用了。
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
